@@ -1,0 +1,4 @@
+interface:
+  display_name: "iOS 游戏移植与修复"
+  short_description: "Windows to iPad game porting and troubleshooting"
+  default_prompt: "使用 $ios-game-porting 检查当前项目，并按已验证的流程继续移植或排障。"
