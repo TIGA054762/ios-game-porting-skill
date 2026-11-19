@@ -1,6 +1,6 @@
 ---
 name: ios-game-porting
-description: Guide iPhone and iPad game porting, device compatibility, iOS sideloading choices, NX2Apple or S2Arm builds, external data, saves, MetalFX, and evidence-led troubleshooting. Use for game porting and sideloading projects; verify device and tool versions before acting.
+description: Guide iPhone and iPad game porting, device compatibility, iOS sideloading choices, container hosting to work around sideload slot limits, NX2Apple or S2Arm builds, external data, saves, MetalFX, and evidence-led troubleshooting. Use for game porting and sideloading projects; verify device and tool versions before acting.
 ---
 
 # iOS 游戏移植与排障
@@ -18,6 +18,7 @@ description: Guide iPhone and iPad game porting, device compatibility, iOS sidel
 
 - 首先读 [设备与兼容性](references/devices.md)，确认机型、系统、存储、能力与电脑环境，不根据芯片名或系统版本保证效果。
 - 选侧载工具或排查签名问题：读 [侧载选择与排障](references/sideloading.md)。
+- 名额不够、要把多个应用装进一个宿主：读 [容器方案](references/container.md)。容器宿主本身占一个名额，装入的 guest 不单独占用；但兼容性、扩展、JIT 需逐项实测，不能把"装上了"当作"能跑"。
 - 新游戏从输入调查到安装验收：读 [构建与部署流程](references/workflow.md)。安装包、外部资源和签名是不同步骤，不能混为一谈。
 - 画面、MetalFX、分辨率和帧率：读 [图形与性能](references/graphics.md)，不要混淆超分、插帧和解锁游戏帧率。
 - 遇到编译、安装、黑屏、语言、帧率、触控或后台问题：读 [故障与避坑](references/pitfalls.md)，先取当前日志，再改变单一变量验证。
@@ -27,5 +28,7 @@ description: Guide iPhone and iPad game porting, device compatibility, iOS sidel
 ## 核心交付原则
 
 记录输入版本、工具链、命令与产物、保存策略、日志、体积、校验方法和设备实际验证。区分编译完成、安装完成、资源读回校验、启动成功、用户确认存档与长时间游玩；哪一步未验证就明确写出。需要用户在设备上配合时给出具体动作，不干扰其他应用。
+
+侧载名额紧张时，先把"必须独立安装"和"可以装进容器"分开：容器宿主占一个名额，装入的应用不单独占用，但宿主能力之外的东西（特殊 entitlement、JIT、扩展、专属权限）容器也给不了。迁移的判据是容器内能启动且能读档，不是文件推完了。
 
 每次试验前备份用户进度；高风险补丁按游戏版本和 Build ID 匹配，默认可回退。设备配置每次只改变一个变量，记录基线、改动、重启与对照，记录看到的结果而非预设结论。结束时说明保留了什么、变更了什么、如何恢复以及尚未解决的问题。

@@ -9,10 +9,27 @@
 | [AltStore Classic](https://github.com/altstoreio/AltStore) | 使用 AltServer 和 Apple 账号；可在设备管理安装、续签及停用应用 | 适合已有 AltStore 用户；Windows 端核对其当前 Apple 驱动、服务和网络要求；不是 AltStore PAL 的同义词 |
 | [SideStore](https://github.com/SideStore/SideStore) | AltStore 的开源分支，初装需电脑，后续使用设备端流程、配对、Wi-Fi 和 VPN | 适合希望设备端刷新的人；先核对最新官方安装文档，不保证无需人工干预 |
 | [Sideloadly](https://sideloadly.io/) | 桌面端安装 IPA，官方列出自动刷新及无线功能 | 可比较对大包、扩展和签名的实际表现；本项目只引用其官网，不将它描述成已确认开源或本项目依赖 |
-| [LiveContainer](https://github.com/LiveContainer/LiveContainer) | 在已安装的宿主中运行部分 IPA | 本身仍需安装，应用兼容性、文件访问和运行限制各异；不是全部游戏都能用，也不保证可满足特殊权限 |
+| [LiveContainer](https://github.com/LiveContainer/LiveContainer) | 在已安装的宿主中运行其他 IPA；宿主本身占 1 个名额，装入的 guest 不单独占用名额 | 缓解"只有 3 个侧载位置"的主要手段，也能装非游戏应用；但兼容性取决于被装应用所需的能力，详见 [容器方案](container.md) |
 | [TrollStore](https://github.com/opa334/TrollStore) | 利用受支持系统版本上的特定机制安装应用 | 仅限官方列明的版本和安装条件，不推断最新系统可用，也不要求用户更改系统 |
 
 AltStore Classic 的官方文档记载：免费个人开发账号常见的限制包括 7 天刷新、最多 3 个活跃侧载 App，以及 7 天内最多 10 个 App ID；App 扩展可消耗额外 ID。实际以账户、系统、工具与官方当前规则为准，不能把“活跃应用数”和“App ID 数”混为一谈。停用通常由 AltStore 备份后移除 App，仍应先独立备份并验证重要存档。见 [激活应用](https://faq.altstore.io/altstore-classic/activating-apps)、[App IDs](https://faq.altstore.io/altstore-classic/app-ids)。
+
+## 名额、容器与签名对象
+
+名额紧张时，先把应用分成两类：
+
+| 类型 | 判据 | 去向 |
+|---|---|---|
+| 必须独立安装 | 需要宿主没有的 entitlement、需要被调试器直接附加、或签名工具必须特殊处理扩展 | 占名额，选能管住它的签名工具 |
+| 可以装进容器 | 普通 UIKit/SwiftUI 应用，权限需求在容器能力之内 | 装进容器宿主，不单独占名额 |
+
+三个要点：
+
+1. **容器不是绕过签名**，只是把签名对象从每个应用换成宿主。宿主自身仍占 1 个名额、仍按 7 天续签，也仍受账号规则约束。
+2. **容器能装的不只是游戏**。同样一套导入和保活流程可以装工具类 IPA；这是它相对引擎宿主（NX2Apple、S2Arm 等只跑自家构建产物）的额外价值。
+3. **能不能跑要实测**。容器给不了宿主本身没有的 entitlement；带 app 扩展、依赖特殊文件访问、或需要 JIT 的应用要单独核查。签名工具对扩展的处理也不一致：同一个 IPA，用工具 A 装可能丢掉扩展，用工具 B 装则完整，这种差异只能靠日志验证。
+
+具体的数据布局、迁移步骤、传输性能与校验方法见 [容器方案](container.md)。
 
 ## Windows / macOS 安装流程
 
